@@ -30,16 +30,22 @@ const validateBearerToken = (req, res, next) => {
     //verifying the bearer token.
     bearerToken = bearerToken.replace("Bearer ", "").replace("bearer ", "");
 
-    const publicKey = fs.readFileSync(path.join(__dirname, '../certs/public.key'), 'utf8');
-    jwt.verify(bearerToken, publicKey, [], (error, decodedToken)=> {
-        if (error) {
-            next(new DetailedError("You are not authorized", 401))
-            return;
-        }
+    const publicKey = fs.readFileSync(path.join(__dirname, "../certs/public.key"));
+    if (publicKey) {
+        jwt.verify(bearerToken, publicKey, {algorithm: "RS256", "issuer": "express-demo", expiresIn: "1h"}, (error, decodedToken)=> {
+            if (error) {
+                console.log(error);
+                next(new DetailedError("You are not authorized", 401))
+                return;
+            }
 
-        console.log(decodedToken);
+            console.log(decodedToken);
 
-    })
+        })
+    }
+    else {
+        next(new DetailedError("jwt public is not set", 400, true, true));
+    }
 
 }
 

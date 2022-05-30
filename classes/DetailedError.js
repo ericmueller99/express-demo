@@ -3,12 +3,15 @@ class DetailedError extends Error{
     #sendErrorEmail = false; //does this error alert me?
     #returnToClient = true //is this error returned to the client ?
     #statusCode;
+    #throwError = false;
 
-    constructor(message, statusCode) {
+    constructor(message, statusCode = 400, throwError = false, sendErrorEmail = false) {
         super(message);
         this.result = false;
         this.errorMessage = message;
         this.#statusCode = statusCode;
+        this.#throwError = throwError;
+        this.#sendErrorEmail = sendErrorEmail;
     }
 
     set returnToClient(value) {
@@ -33,6 +36,14 @@ class DetailedError extends Error{
 
     set statusCode(statusCode) {
         this.#statusCode = statusCode;
+    }
+
+    set throwError(value) {
+        this.#throwError = value;
+    }
+
+    get throwError() {
+        return this.#throwError;
     }
 
 }

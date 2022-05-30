@@ -1,6 +1,7 @@
 const express = require('express');
 const {DetailedError} = require("../classes/DetailedError");
 const router = express.Router();
+const {User} = require('../classes/User');
 
 router.get("/", (req,res,next) => {
 
@@ -9,7 +10,21 @@ router.get("/", (req,res,next) => {
         return;
     }
 
-    console.log("hello");
+    const user = new User();
+    try {
+        user.createBearerToken()
+        res.json({
+            result: true,
+            expiration: 60,
+            access_token: user.bearerToken
+        })
+    }
+    catch (error) {
+        console.log(error);
+        next(error);
+    }
+
+
 
 })
 
