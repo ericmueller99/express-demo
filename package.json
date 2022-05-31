@@ -6,6 +6,7 @@
   "author": "Eric Mueller",
   "license": "ISC",
   "dependencies": {
+    "@azure/cosmos": "^3.16.0",
     "body-parser": "^1.20.0",
     "dotenv": "^16.0.1",
     "eric-utils": "https://github.com/ericmueller99/eric-utils",

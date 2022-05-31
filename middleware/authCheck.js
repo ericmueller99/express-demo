@@ -2,6 +2,7 @@ const { DetailedError } = require('../classes/DetailedError');
 const jwt = require('jsonwebtoken');
 const fs = require('fs');
 const path = require('path');
+const {User} = require('../classes/User');
 
 //paths that do not require authentication.  Probably a better idea to put this in some kind of configuration file.
 const authFreePaths = new Set(['/authenticate']);
@@ -30,22 +31,20 @@ const validateBearerToken = (req, res, next) => {
     //verifying the bearer token.
     bearerToken = bearerToken.replace("Bearer ", "").replace("bearer ", "");
 
-    const publicKey = fs.readFileSync(path.join(__dirname, "../certs/public.key"));
-    if (publicKey) {
-        jwt.verify(bearerToken, publicKey, {algorithm: "RS256", "issuer": "express-demo", expiresIn: "1h"}, (error, decodedToken)=> {
-            if (error) {
-                console.log(error);
-                next(new DetailedError("You are not authorized", 401))
-                return;
+    const user = new User(bearerToken);
+    user.validateToken()
+        .then(() => {
+            if (user.info && user.isValidToken) {
+                req.user = user.info;
+                req.isValid = user.isValidToken;
+                req.bearerToken = user.bearerToken;
+                next();
             }
-
-            console.log(decodedToken);
-
+            else {
+                throw new DetailedError("There was an error validating the token", 500, true, true);
+            }
         })
-    }
-    else {
-        next(new DetailedError("jwt public is not set", 400, true, true));
-    }
+        .catch(error => next(error));
 
 }
 

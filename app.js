@@ -4,7 +4,7 @@ require("dotenv").config();
 const bodyParser = require('body-parser');
 const {validateBearerToken: authCheck} = require('./middleware/authCheck');
 const {DetailedError} = require('./classes/DetailedError');
-const ws = require('ws');
+const webSockets = require('./routes/tic-tac-toe-game');
 
 app.use(bodyParser.json());
 
@@ -16,8 +16,12 @@ process.on('uncaughtException', (error, req, res) => {
 })
 
 //routes
-const authentication = require('./routes/authenticate');
-app.use('/authenticate', authentication);
+const authenticationRoutes = require('./routes/authenticate');
+const userRoutes = require('./routes/user');
+const ticTacToeRoutes = require('./routes/tic-tac-toe');
+app.use('/authenticate', authenticationRoutes);
+app.use('/user', userRoutes);
+app.use('/tic-tac-toe', ticTacToeRoutes);
 
 //error handling
 app.use((error, req, res, next) => {
@@ -32,6 +36,8 @@ app.use((error, req, res, next) => {
             //a error happened that was not instance of Detailed Error and not handled properly.
             //here I would create a detailed error for logging and other notifications
 
+            console.log(error);
+
             res.status(400);
             res.json({result:false, errorMessage: "There was a unhandled server error"});
         }
@@ -44,25 +50,4 @@ const server = app.listen(port, () => {
     console.log("app.js started");
 });
 
-
-const wsServer = new ws.Server({
-    noServer: true
-});
-server.on("upgrade", (req, socket, head) => {
-    wsServer.handleUpgrade(req, socket, head, (webSocket) => {
-        wsServer.emit('connection', webSocket, req);
-    })
-})
-
-wsServer.on("connection", (connection, connectionRequest)=> {
-    const [_path, params] = connectionRequest?.url?.split('?');
-    console.log(_path, params);
-    connection.on("message", (message) => {
-
-        console.log("Hello");
-
-        console.log(message);
-        connection.send("Hello");
-    })
-})
-
+webSockets(server);

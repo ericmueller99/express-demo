@@ -5,7 +5,8 @@ const {User} = require('../classes/User');
 
 router.get("/", (req,res,next) => {
 
-    if (!req.body.client_secret || (req.body.client_id)) {
+    const {username, password} = req.body;
+    if (!username || (!password)) {
         next(new DetailedError("client_secret and client_id are required fields"));
         return;
     }
@@ -23,8 +24,6 @@ router.get("/", (req,res,next) => {
         console.log(error);
         next(error);
     }
-
-
 
 })
 
