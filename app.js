@@ -4,7 +4,7 @@ require("dotenv").config();
 const bodyParser = require('body-parser');
 const {validateBearerToken: authCheck} = require('./middleware/authCheck');
 const {DetailedError} = require('./classes/DetailedError');
-const webSockets = require('./routes/tic-tac-toe-game');
+const {webSockets} = require('./routes/tic-tac-toe-game');
 
 app.use(bodyParser.json());
 

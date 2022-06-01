@@ -34,14 +34,14 @@ const validateBearerToken = (req, res, next) => {
     const user = new User(bearerToken);
     user.validateToken()
         .then(() => {
-            if (user.info && user.isValidToken) {
-                req.user = user.info;
+            if (user.data && user.isValidToken) {
+                req.user = user.data;
                 req.isValid = user.isValidToken;
                 req.bearerToken = user.bearerToken;
                 next();
             }
             else {
-                throw new DetailedError("There was an error validating the token", 500, true, true);
+                throw new DetailedError("invalid token.", 401, true, true);
             }
         })
         .catch(error => next(error));

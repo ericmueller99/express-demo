@@ -7,8 +7,9 @@ class User {
 
     //private fields so they cannot be modified outside of the class without methods.
     #bearerToken;
+    #bearerTokenExpiration = Math.floor(Date.now() / 1000 + (60 * 60))
     #validToken = false;
-    #user = {
+    #data = {
         username: null,
         validFor: []
     }
@@ -25,8 +26,8 @@ class User {
         return this.#bearerToken;
     }
 
-    get info() {
-        return this.#user;
+    get data() {
+        return this.#data;
     }
     get isValidToken() {
         return this.#validToken;
@@ -39,11 +40,10 @@ class User {
         if (privateKey) {
             let payload = {
                 data: {
-                    tokenType,
                     validFor: [tokenType],
                     ...tokenPayload
                 },
-                exp: Math.floor(Date.now() / 1000 + (60 * 60)),
+                exp: this.#bearerTokenExpiration,
             }
             this.#bearerToken = jwt.sign(payload, privateKey, {algorithm: "RS256", issuer: "express-demo"});
         }
@@ -54,7 +54,7 @@ class User {
 
     #resetValidityState() {
         this.#validToken = false;
-        this.#user = {
+        this.#data = {
             username: null,
             validFor: []
         }
@@ -76,7 +76,7 @@ class User {
                 const decoded = jwt.verify(this.#bearerToken, publicKey, {algorithm: "RS256", "issuer": "express-demo", expiresIn: "1h"});
                 //here if we really wanted to get crazy we could check the db to makes sure it matches
                 this.#validToken = true;
-                this.#user = decoded.data;
+                this.#data = decoded.data;
             }
             catch (error) {
                 throw new DetailedError(error.message, 401);

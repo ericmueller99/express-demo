@@ -5,24 +5,25 @@ const {User} = require('../classes/User');
 
 router.get("/", (req,res,next) => {
 
-    const {username, password} = req.body;
-    if (!username || (!password)) {
-        next(new DetailedError("client_secret and client_id are required fields"));
-        return;
-    }
-
+    //we would obviously authenticate these credentials or anything else passed before authentcating and creating a bearer token, but for this demo i am just focusing on a tic-tac-toe game.
     const user = new User();
-    try {
-        user.createBearerToken()
+    const {type, username, password} = req?.body;
+    if (type === 'tic-tac-toe' && username) {
+        user.createBearerToken({username}, "tic-tac-toe");
         res.json({
             result: true,
             expiration: 60,
             access_token: user.bearerToken
         })
     }
-    catch (error) {
-        console.log(error);
-        next(error);
+    else if (username && password) {
+        res.json({
+            result: true,
+            message: "this login is not supported yet"
+        })
+    }
+    else {
+        next(new DetailedError("type must = tic-tac-toe and username must not be blank or username and password are required"));
     }
 
 })
