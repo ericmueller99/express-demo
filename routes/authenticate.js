@@ -3,11 +3,12 @@ const {DetailedError} = require("../classes/DetailedError");
 const router = express.Router();
 const {User} = require('../classes/User');
 
-router.get("/", (req,res,next) => {
+router.post("/", (req,res,next) => {
 
     //we would obviously authenticate these credentials or anything else passed before authentcating and creating a bearer token, but for this demo i am just focusing on a tic-tac-toe game.
     const user = new User();
     const {type, username, password} = req?.body;
+
     if (type === 'tic-tac-toe' && username) {
         user.createBearerToken({username}, "tic-tac-toe");
         res.json({
