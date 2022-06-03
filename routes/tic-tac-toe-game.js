@@ -26,7 +26,7 @@ function webSockets(expressServer) {
             const {pathname: pathName, query} = parse(req.url);
             const queryStrings = qs.parse(query);
 
-            let availablePaths = new Set(['/tic-tac-toe/play', 'tic-tac-toe/lobby']);
+            let availablePaths = new Set(['/tic-tac-toe/play', '/tic-tac-toe/lobby']);
             if (availablePaths.has(pathName)) {
 
                 //authenticating the access token
